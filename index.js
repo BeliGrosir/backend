@@ -14,7 +14,7 @@ const db = require("./src/models");
 
 app.use('/api/static', express.static(path.join(__dirname, 'uploads')))
 
-const port = 8000 || process.env.PORT;
+const port = process.env.PORT || 5000;
 app.listen(port, () => {
     console.log(`App running on port ${port}`)
 })
