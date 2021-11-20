@@ -5,11 +5,5 @@ module.exports = {
     USER: process.env.DB_USERNAME,
     PASSWORD: process.env.DB_PASSWORD,
     DB: process.env.DB_DATABASE,
-    dialect: process.env.DB_DIALECT,
-    dialectOptions: {
-      ssl: true
-    },
-    ssl: {
-      rejectUnauthorized: false,
-    }
+    dialect: process.env.DB_DIALECT
   };
