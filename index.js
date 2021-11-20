@@ -10,7 +10,7 @@ const router = require('./src/routes/indexRoutes');
 app.use('/api', router);
 
 const db = require("./src/models");
-// db.sequelize.sync()
+db.sequelize.sync()
 
 app.use('/api/static', express.static(path.join(__dirname, 'uploads')))
 

@@ -8,5 +8,8 @@ module.exports = {
     dialect: process.env.DB_DIALECT,
     dialectOptions: {
       ssl: true
+    },
+    ssl: {
+      rejectUnauthorized: false,
     }
   };
