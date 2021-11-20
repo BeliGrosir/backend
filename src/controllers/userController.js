@@ -48,6 +48,9 @@ const logIn = async (req, res) => {
                 user_id: data.user_id,
                 username: data.username,
                 name: data.name,
+                email: data.email,
+                address: data.address,
+                phone_no: data.phone_no,
                 token: accessToken
             })
         } else {

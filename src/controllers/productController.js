@@ -1,5 +1,4 @@
 const db = require("../models");
-const sequelize = db.sequelize;
 const Product = db.product;
 const Store = db.store;
 
@@ -7,8 +6,8 @@ const createProduct = (req, res) => {
     const product = {
         store_id: req.body.store_id,
         category_id: req.body.category_id,
-        product_name: req.body.retail_price,
-        retail_price: req.body.product_desc,
+        product_name: req.body.product_name,
+        retail_price: req.body.retail_price,
         product_price: req.body.product_price,
         product_image: req.file.filename,
         stock: req.body.stock,
@@ -80,8 +79,58 @@ const getProduct = (req, res) => {
     })
 }
 
+const updateProduct = (req, res) => {
+    console.log(req.query.product_id)
+    const product = {
+        store_id: req.body.store_id,
+        category_id: req.body.category_id,
+        product_name: req.body.product_name,
+        retail_price: req.body.retail_price,
+        product_price: req.body.product_price,
+        stock: req.body.stock,
+    }
+
+    Product.update(product, {
+        where: {
+            product_id: req.query.product_id
+        }
+    }).then(data => {
+            res.send({
+                status: "Success",
+                message: "Update product successful"
+            });
+        })
+        .catch(err => {
+            res.status(500).send({
+                message:
+                err.message || "Error occurred while updating product"
+            });
+    });
+}
+
+const deleteProduct = (req, res) => {
+    Product.destroy({
+        where: {
+            product_id: req.query.product_id
+        }
+    }).then(data => {
+            res.send({
+                status: "Success",
+                message: "Delete product successful"
+            });
+        })
+        .catch(err => {
+            res.status(500).send({
+                message:
+                err.message || "Error occurred while deleting product"
+            });
+    });
+}
+
 module.exports = {
     createProduct,
     getAllProduct,
-    getProduct
+    getProduct,
+    updateProduct,
+    deleteProduct
 }
