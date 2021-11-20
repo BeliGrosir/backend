@@ -7,9 +7,6 @@ module.exports = {
     DB: process.env.DB_DATABASE,
     dialect: process.env.DB_DIALECT,
     dialectOptions: {
-      ssl: {
-        require: true,
-        rejectUnauthorized: false
-      }
+      ssl: true
     }
   };
