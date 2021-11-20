@@ -1,12 +1,12 @@
 module.exports = (sequelize, Sequelize) => {
-    const Category = sequelize.define("category", {
-      category_id: {
+    const Status = sequelize.define("order_status", {
+      status_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
         primaryKey: true,
         autoIncrement: true
       },
-      category_name: {
+      status_name: {
         type: Sequelize.STRING,
 		    unique: true,
         allowNull: false
@@ -16,5 +16,5 @@ module.exports = (sequelize, Sequelize) => {
         freezeTableName: true,
         timestamps: false
     });
-    return Category;
+    return Status;
 };

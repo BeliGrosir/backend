@@ -1,6 +1,6 @@
 const db = require("../models");
 const Cart = db.cart_item;
-const Product = db.product;
+const sequelize = db.sequelize
 
 const addToCart = (req, res) => {
     const cart = {
@@ -9,14 +9,45 @@ const addToCart = (req, res) => {
         quantity: req.body.quantity
     }
 
-    Cart.create(cart)
-        .then(data => {
-            res.send({
-                status: "Success",
-                message: "Add product to cart successful"
-            });
-        })
-        .catch(err => {
+    Cart.findOne({
+        where: {
+            user_id: req.user.id,
+            product_id: req.body.product_id
+        }
+    }).then(data => {
+        if (data != null) {
+            Cart.increment('quantity', { by: req.body.quantity, 
+                where: { 
+                cart_item_id: data.cart_item_id 
+            }})
+            .then(data => {
+                res.send({
+                    status: "Success",
+                    message: "Cart item has been added to cart"
+                });
+            })
+            .catch(err => {
+                res.status(500).send({
+                    status: "Failed",
+                    message: err.message || "Error occurred while adding product to cart"
+                });
+            })
+        } else {
+            Cart.create(cart)
+            .then(data => {
+                res.send({
+                    status: "Success",
+                    message: "Add product to cart successful"
+                });
+            })
+            .catch(err => {
+                res.status(500).send({
+                    message:
+                    err.message || "Error occurred while adding product to cart"
+                });
+        });
+        }
+    }).catch(err => {
             res.status(500).send({
                 message:
                 err.message || "Error occurred while adding product to cart"
@@ -123,23 +154,24 @@ const removeCartItem = (req, res) => {
 	});
 }
 
-const getCartItems = (req, res) => {
-    Cart.findAll({
-        where: {
-            user_id: parseInt(req.user.id)
-        },
-        include: Product
-    }).then(data => {
-        res.send({
-            status: "Success", 
-            data: data
-        })
-    }).catch(err => {
-        res.status(500).send({
-            message:
-            err.message || "Error occurred while creating product"
-        });
-    })
+const getCartItems = async (req, res) => {
+	query = `select c.cart_item_id, c.quantity, product.*
+			from product, cart_item c
+			where product.product_id = c.product_id
+			and c.user_id = ${req.user.id}`;
+
+	try {
+		var [result, metadata] = await sequelize.query(query)
+		res.json({
+			status: "Success",
+			data: result,
+		})
+	} catch (error) {
+		res.status(500).json({
+			status: error.message || "Failed",
+			data: [],
+		});
+	}
 }
 
 module.exports = {
