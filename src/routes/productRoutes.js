@@ -7,5 +7,6 @@ router.get("/products", product.getAllProduct)
 router.get("/product", product.getProduct)
 router.put("/product", product.updateProduct)
 router.delete("/product", product.deleteProduct)
+router.get("/search", product.searchProduct)
 
 module.exports = router

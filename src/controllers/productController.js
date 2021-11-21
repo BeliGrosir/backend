@@ -1,6 +1,7 @@
 const db = require("../models");
 const Product = db.product;
 const Store = db.store;
+const { Op } = require("sequelize");
 
 const createProduct = (req, res) => {
     const product = {
@@ -79,6 +80,27 @@ const getProduct = (req, res) => {
     })
 }
 
+const searchProduct = (req, res) => {
+    Product.findAll({
+        where: {
+            product_name: {
+                [Op.substring]: req.query.product_name
+            }
+        },
+        include: Store
+    }).then(data => {
+        res.send({
+            status: "Success", 
+            data: data
+        })
+    }).catch(err => {
+        res.status(500).send({
+            message:
+            err.message || "Error occurred while creating product"
+        });
+    })
+}
+
 const updateProduct = (req, res) => {
     console.log(req.query.product_id)
     const product = {
@@ -132,5 +154,6 @@ module.exports = {
     getAllProduct,
     getProduct,
     updateProduct,
-    deleteProduct
+    deleteProduct,
+    searchProduct
 }

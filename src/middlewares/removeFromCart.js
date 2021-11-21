@@ -1,61 +1,31 @@
 const db = require("../models");
 const Cart = db.cart_item;
+const sequelize = db.sequelize
 
-const removeCartItem = (req, res, next) => {
-    var order_items = req.body.order_items
-    var count = 0;
-    for (let i = 0; i < order_items.length; i++) {
-        Cart.findOne({
-            where: {
-               product_id: order_items[i].product_id,
-               user_id: req.user.id
-            }})
-        .then(data => {
-            if (data.quantity > 1){
-                Cart.decrement('quantity', { by: order_items[i].quantity, where: { 
-                    cart_item_id: data.cart_item_id
-                 }})
-                .then(data => {
-                    count++
-                })
-                .catch(err => {
-                    console.log(err.message)
-                    res.status(500).send({
-                        status: "Success",
-                        message: "Failed to remove cart item"
-                      });
-                      return;
-                })
-            }else{
-                Cart.destroy({
-                    where: { 
-                        cart_item_id: data.cart_item_id 
-                }})
-                .then(data => {
-                    if (data == 1) {
-                        count++
-                    }
-                  })
-                .catch(err => {
-                    console.log(err.message)
-                    res.status(500).send({
-                        status: "Success",
-                        message: "Failed to remove cart item"
-                      });
-                      return;
-                })
+const removeCartItem = async (req, res, next) => {
+    try {
+        for (let i = 0; i < req.productIds.length; i++) {
+            var query = `SELECT c.cart_item_id, c.quantity FROM cart_item c WHERE product_id = ${req.productIds[i]} AND user_id = ${req.user.id}`
+    
+            var [result, metadata] = await sequelize.query(query)
+            var queryDecrement = `UPDATE cart_item SET quantity=quantity-1 WHERE cart_item_id=${result[0].cart_item_id}`
+            var queryDelete = `DELETE FROM cart_item WHERE cart_item_id=${result[0].cart_item_id}`
+            if (result[0].quantity > 1) {
+                var [result, metadata] = await sequelize.query(queryDecrement)
+            } else {
+                var [result, metadata] = await sequelize.query(queryDelete)
             }
             res.send({
                 status: "Success",
                 message: "Order created. Waiting for payment"
             })
-        }).catch(err => {
-            res.send({
-                status: "Failed",
-                message: err.message || "Cart item is not found"
-              });
-            return;
-        });
+        }
+    } catch (e) {
+        res.send({
+            status: "Failed",
+            message: e.message || "Failed to remove from cart item"
+          });
+        return;
     }
 }
 
