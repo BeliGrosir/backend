@@ -86,7 +86,7 @@ const getProduct = (req, res) => {
 
 const searchProduct = async (req, res) => {
     try {
-        var query = `select p.*, s.*
+        var query = `select distinct p.*, s.*
         from product p, store s
         where LOWER(product_name) LIKE LOWER('%${req.query.product_name}%');`
         var [result, metadata] = await sequelize.query(query)
@@ -103,7 +103,6 @@ const searchProduct = async (req, res) => {
 }
 
 const updateProduct = (req, res) => {
-    console.log(req.query.product_id)
     const product = {
         store_id: req.body.store_id,
         category_id: req.body.category_id,
