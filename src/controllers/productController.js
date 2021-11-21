@@ -2,6 +2,7 @@ const db = require("../models");
 const Product = db.product;
 const Store = db.store;
 const { Op } = require("sequelize");
+const sequelize = db.sequelize;
 
 const createProduct = (req, res) => {
     const product = {
@@ -34,7 +35,8 @@ const getAllProduct = (req, res) => {
         Product.findAll({
             where: {
                 category_id: req.query.category_id
-            }
+            },
+            include: Store
         }).then(data => {
             res.send({
                 status: "Success", 
@@ -47,7 +49,9 @@ const getAllProduct = (req, res) => {
             });
         })
     } else {
-        Product.findAll().then(data => {
+        Product.findAll({
+            include: Store
+        }).then(data => {
             res.send({
                 status: "Success", 
                 data: data
@@ -80,25 +84,22 @@ const getProduct = (req, res) => {
     })
 }
 
-const searchProduct = (req, res) => {
-    Product.findAll({
-        where: {
-            product_name: {
-                [Op.substring]: req.query.product_name
-            }
-        },
-        include: Store
-    }).then(data => {
+const searchProduct = async (req, res) => {
+    try {
+        var query = `select p.*, s.*
+        from product p, store s
+        where LOWER(product_name) LIKE LOWER('%${req.query.product_name}%');`
+        var [result, metadata] = await sequelize.query(query)
         res.send({
             status: "Success", 
-            data: data
+            data: result
         })
-    }).catch(err => {
+    } catch (e) {
         res.status(500).send({
             message:
             err.message || "Error occurred while creating product"
         });
-    })
+    }
 }
 
 const updateProduct = (req, res) => {
