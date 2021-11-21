@@ -88,7 +88,7 @@ const searchProduct = async (req, res) => {
     try {
         var query = `select distinct p.*, s.*
         from product p, store s
-        where LOWER(product_name) LIKE LOWER('%${req.query.product_name}%');`
+        where p.store_id = s.store_id AND LOWER(p.product_name) LIKE LOWER('%${req.query.product_name}%');`
         var [result, metadata] = await sequelize.query(query)
         res.send({
             status: "Success", 
